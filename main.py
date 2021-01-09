@@ -124,13 +124,13 @@ if __name__ == '__main__':
     model_filename = 'models/DeepFont.model'
     deep_font = DeepFont(shape + (1,))
     if not path.exists(model_filename):
-        evaluation = deep_font.train(np.expand_dims(train_x, axis=-1), train_y, 150, 128)
+        evaluation = deep_font.train(train_x, train_y, 50, 128)
         print('Model Loss: {L} ; Accuracy: {A}'.format(L=evaluation[0], A=evaluation[1]))
         deep_font.save(model_filename)
     else:
         deep_font.load(model_filename)
         print('Model loaded')
 
-    evaluation = deep_font.evaluate(np.expand_dims(test_x, axis=-1), test_y)
+    evaluation = deep_font.evaluate(test_x, test_y)
     print('Test Loss: {L} ; Accuracy: {A}'.format(L=evaluation[0], A=evaluation[1]))
  

@@ -2,6 +2,8 @@ from tensorflow.keras import Sequential
 from tensorflow.keras.models import load_model
 from tensorflow.keras.layers import Conv2D, MaxPooling2D, BatchNormalization, Conv2DTranspose, UpSampling2D, Flatten, Dense, Dropout
 from tensorflow.keras import optimizers
+from tensorflow.keras import utils
+import numpy as np
 
 
 class DeepFont:
@@ -35,19 +37,23 @@ class DeepFont:
         self.model.add(Dropout(0.5))
         self.model.add(Dense(2383, activation='relu', name='fc8'))
 
-        self.model.add(Dense(1, activation='softmax', name='softmax_classifier'))
+        self.model.add(Dense(3, activation='softmax', name='softmax_classifier'))
 
-        opt = optimizers.SGD(lr=0.01)
-        self.model.compile(loss='binary_crossentropy', optimizer=opt, metrics=['accuracy'])
+        opt = optimizers.Adam(lr=0.01)
+        self.model.compile(loss='mean_squared_error', optimizer=opt, metrics=['accuracy'])
 
         self.model.summary()
 
     def train(self, images, labels, epochs, batch_size):
-        self.model.fit(images, labels, epochs=epochs, batch_size=batch_size)
-        return self.model.evaluate(images, labels)
+        x = np.expand_dims(images, axis=-1);
+        y = utils.to_categorical(labels)
+        self.model.fit(x, y, epochs=epochs, batch_size=batch_size)
+        return self.model.evaluate(x, y)
 
     def evaluate(self, test_images, test_labels):
-        return self.model.evaluate(test_images, test_labels, verbose=0)
+        x = np.expand_dims(test_images, axis=-1);
+        y = utils.to_categorical(test_labels)
+        return self.model.evaluate(x, y, verbose=0)
 
     def save(self, filename):
         self.model.save(filename + '.h5')
