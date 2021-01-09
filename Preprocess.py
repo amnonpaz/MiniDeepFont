@@ -8,7 +8,7 @@ Normalize the mean and std of each channel in an image
 def normalize_image(image):
     image = cv2.cvtColor(image, cv2.COLOR_BGR2YUV).astype('float32')
     mean, std = image.mean(axis=(0, 1)), image.std(axis=(0, 1))
-    return (image - mean) / std
+    return (image - mean) / std / 255
 
 
 '''
