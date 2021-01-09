@@ -1,0 +1,7 @@
+*.idea/
+*jpg
+*__pycache__/
+*.swp
+*.pdf
+*.gz
+*.zip
