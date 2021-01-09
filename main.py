@@ -113,8 +113,8 @@ def load_database(filename: str, shape: tuple):
 
 
 if __name__ == '__main__':
-    input_filename = 'datasets/initial/SynthText.h5'
-    font_images_filename = 'datasets/initial/ExtractedFonts.h5'
+    input_filename = 'datasets/train/SynthText.h5'
+    font_images_filename = 'datasets/train/ExtractedFonts.h5'
     shape = (105, 105)
     prepare_database(input_filename, font_images_filename, shape, rewrite=False)
 
