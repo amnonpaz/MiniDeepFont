@@ -98,15 +98,15 @@ def prepare_database(hdf5_input: str, hdf5_output: str, shape: tuple,
 
                 for bb_idx in range(bboxes.shape[-1]):
                     bb = bboxes[:, :, bb_idx]
-                    character = Preprocess.crop_character(img, bb, shape, affine_crop)
+                    character = Preprocess.crop_character(img, bb, shape, affine_crop)[:, :, 0]
                     dataset = images_group.create_dataset('{K}_{I}'.format(K=key, I=bb_idx), shape=character.shape, data=character, dtype='f')
                     dataset.attrs['label'] = encode_font_name(fonts[bb_idx].decode('utf-8'))
 
 
-def load_database(filename: str):
+def load_database(filename: str, shape: tuple):
     with h5py.File(filename, 'r') as db:
         keys = list(db['images'].keys())
-        images = np.array([db['images'][k][:] for k in keys])
+        images = np.array([np.array(db['images'][k][:]).reshape(shape) for k in keys])
         labels = np.array([db['images'][k].attrs['label'] for k in keys])
 
         return images, labels
@@ -118,15 +118,19 @@ if __name__ == '__main__':
     shape = (105, 105)
     prepare_database(input_filename, font_images_filename, shape, rewrite=False)
 
-    images, labels = load_database(font_images_filename)
-    train_x, test_x, train_y, test_y = train_test_split(images, labels, test_size=0.25)
+    images, labels = load_database(font_images_filename, shape)
+    train_x, test_x, train_y, test_y = train_test_split(images, labels, test_size=0.20)
 
-    model_filename = 'DeepFont.model'
-    deep_font = DeepFont(shape + (3,))
+    model_filename = 'models/DeepFont.model'
+    deep_font = DeepFont(shape + (1,))
     if not path.exists(model_filename):
-        evaluation = deep_font.train(train_x, train_y, 2, 128)
-        print('Model evaluation: {E}'.format(E=evaluation))
+        evaluation = deep_font.train(np.expand_dims(train_x, axis=-1), train_y, 150, 128)
+        print('Model Loss: {L} ; Accuracy: {A}'.format(L=evaluation[0], A=evaluation[1]))
+        deep_font.save(model_filename)
     else:
         deep_font.load(model_filename)
         print('Model loaded')
+
+    evaluation = deep_font.evaluate(np.expand_dims(test_x, axis=-1), test_y)
+    print('Test Loss: {L} ; Accuracy: {A}'.format(L=evaluation[0], A=evaluation[1]))
  

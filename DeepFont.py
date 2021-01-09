@@ -1,6 +1,7 @@
-from keras import Sequential
-from keras.models import load_model
-from keras.layers import Conv2D, MaxPooling2D, BatchNormalization, Conv2DTranspose, UpSampling2D, Flatten, Dense, Dropout
+from tensorflow.keras import Sequential
+from tensorflow.keras.models import load_model
+from tensorflow.keras.layers import Conv2D, MaxPooling2D, BatchNormalization, Conv2DTranspose, UpSampling2D, Flatten, Dense, Dropout
+from tensorflow.keras import optimizers
 
 
 class DeepFont:
@@ -34,16 +35,22 @@ class DeepFont:
         self.model.add(Dropout(0.5))
         self.model.add(Dense(2383, activation='relu', name='fc8'))
 
-        self.model.add(Dense(3, activation='softmax', name='softmax_classifier'))
+        self.model.add(Dense(1, activation='softmax', name='softmax_classifier'))
 
-        self.model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
+        opt = optimizers.SGD(lr=0.01)
+        self.model.compile(loss='binary_crossentropy', optimizer=opt, metrics=['accuracy'])
+
+        self.model.summary()
 
     def train(self, images, labels, epochs, batch_size):
         self.model.fit(images, labels, epochs=epochs, batch_size=batch_size)
-        return self.evaluate(images, labels)
+        return self.model.evaluate(images, labels)
+
+    def evaluate(self, test_images, test_labels):
+        return self.model.evaluate(test_images, test_labels, verbose=0)
 
     def save(self, filename):
-        self.model.save(filename)
+        self.model.save(filename + '.h5')
 
     def load(self, filename):
         self.model = load_model(filename)
