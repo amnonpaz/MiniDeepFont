@@ -151,7 +151,7 @@ if __name__ == '__main__':
     train_x, test_x, train_y, test_y = train_test_split(images, labels, test_size=0.20)
 
     model_filename = 'models/DeepFont.model'
-    deep_font = DeepFont(shape + (1,))
+    deep_font = DeepFont(shape + (3,), opt_name='sgd')
     if not path.exists(model_filename):
         evaluation = deep_font.train(train_x, train_y, 50, 128)
         print('Model Loss: {L} ; Accuracy: {A}'.format(L=evaluation[0], A=evaluation[1]))
