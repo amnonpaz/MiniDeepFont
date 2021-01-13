@@ -91,7 +91,6 @@ def prepare_database(hdf5_input: str, hdf5_output: str, shape: tuple,
                     for func in augmentations[label]:
                         aug = func(character)
                         db_add_datadet(images_group, aug, label, key, bb_idx, func.__name__)
-                        counts[label] += 1
 
 
 def load_database(filename: str, shape: tuple):
