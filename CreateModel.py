@@ -93,7 +93,7 @@ def prepare_database(hdf5_input: str, hdf5_output: str, shape: tuple,
                         db_add_datadet(images_group, aug, label, key, bb_idx, func.__name__)
 
 
-def load_database(filename: str, shape: tuple):
+def load_database(filename: str):
     with h5py.File(filename, 'r') as db:
         keys = list(db['images'].keys())
         images = np.array([np.array(db['images'][k][:]) for k in keys])
