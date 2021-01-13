@@ -1,6 +1,4 @@
 import h5py
-import matplotlib.pyplot as plt
-import cv2
 import numpy as np
 import Preprocess
 from os import path
@@ -42,39 +40,6 @@ def bb_color(font):
             break
     return res
 
-
-def input_test(hdf5_filename, sample_index, affine_crop=False, do_norm=True, show_input=False):
-    with h5py.File(hdf5_filename, 'r') as images_db:
-        imgs_keys = list(images_db['data'].keys())
-        key = imgs_keys[sample_index]
-        img = images_db['data'][key][:]
-
-        bboxes = images_db['data'][key].attrs['charBB']
-        fonts = images_db['data'][key].attrs['font']
-
-        # If we normalize, we want to see the difference between
-        # the original image and the normalized image
-        if show_input and do_norm:
-            plt.figure('Test image original')
-            plt.imshow(img)
-            plt.show(block=False), plt.xticks([]), plt.yticks([])
-
-            img = Preprocess.normalize_image(img)
-            plt.figure('Test image normalized')
-            plt.imshow(cv2.cvtColor(img, cv2.COLOR_YUV2RGB))
-            plt.show(block=False), plt.xticks([]), plt.yticks([])
-
-        plt.figure('Fonts')
-        plt.subplot()
-        for bb_idx in range(bboxes.shape[-1]):
-            bb = bboxes[:, :, bb_idx]
-            character = Preprocess.crop_character(img, bb, (105, 105), affine_crop)
-
-            plt.subplot(4, int(bboxes.shape[-1]/4 + 1), bb_idx + 1)
-            plt.imshow(character if not do_norm else cv2.cvtColor(character, cv2.COLOR_YUV2RGB))
-            plt.title(fonts[bb_idx].decode("utf-8")), plt.xticks([]), plt.yticks([])
-
-        plt.show()
 
 
 def db_add_datadet(db_group, img, label,key: str, bb_idx: str, postfix=''):
