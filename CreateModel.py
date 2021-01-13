@@ -42,10 +42,11 @@ def bb_color(font):
 
 
 
-def db_add_datadet(db_group, img, label,key: str, bb_idx: str, postfix=''):
+def db_add_datadet(db_group, img, label, letter, key: str, bb_idx: str, postfix=''):
     dataset = db_group.create_dataset('{K}_{I}_{P}'.format(K=key, I=bb_idx, P=postfix),
                                       shape=img.shape, data=img, dtype='f')
     dataset.attrs['label'] = label
+    dataset.attrs['letter'] = letter
 
 
 def prepare_database(hdf5_input: str, hdf5_output: str, shape: tuple,
@@ -81,6 +82,7 @@ def prepare_database(hdf5_input: str, hdf5_output: str, shape: tuple,
 
                 bboxes = images_db['data'][key].attrs['charBB']
                 fonts = images_db['data'][key].attrs['font']
+                letters = ''.join([word.decode('utf-8') for word in images_db['data'][key].attrs['txt']])
 
                 for bb_idx in range(bboxes.shape[-1]):
                     bb = bboxes[:, :, bb_idx]
@@ -90,7 +92,7 @@ def prepare_database(hdf5_input: str, hdf5_output: str, shape: tuple,
 
                     for func in augmentations[label]:
                         aug = func(character)
-                        db_add_datadet(images_group, aug, label, key, bb_idx, func.__name__)
+                        db_add_datadet(images_group, aug, label, letters[bb_idx], key, bb_idx, func.__name__)
 
 
 def load_database(filename: str):
