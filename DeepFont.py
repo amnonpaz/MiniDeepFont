@@ -3,7 +3,9 @@ from tensorflow.keras.models import load_model
 from tensorflow.keras.layers import Conv2D, MaxPooling2D, BatchNormalization, Conv2DTranspose, UpSampling2D, Flatten, Dense, Dropout
 from tensorflow.keras import optimizers
 from tensorflow.keras import utils
+from tensorflow.keras.preprocessing.image import ImageDataGenerator
 import numpy as np
+from CustomAugmentations import CustomAugmentations
 
 
 class DeepFont:
@@ -48,14 +50,26 @@ class DeepFont:
 
         self.model.summary()
 
+
+#        self.datagen = ImageDataGenerator()
+#        self.datagen = ImageDataGenerator(featurewise_std_normalization=True,
+#                                          rotation_range=5)
+        self.datagen = ImageDataGenerator(rescale=1. / 255,
+                                          rotation_range=5)
+
+        self.datagen = CustomAugmentations()
+
     def train(self, images, labels, epochs, batch_size):
-        x = np.expand_dims(images, axis=-1);
+        x = images
         y = utils.to_categorical(labels)
-        self.model.fit(x, y, epochs=epochs, batch_size=batch_size)
+        self.datagen.fit(x)
+        self.model.fit(self.datagen.flow(x, y, batch_size=batch_size),
+                       steps_per_epoch=len(x) / batch_size,
+                       epochs=epochs)
         return self.model.evaluate(x, y)
 
     def evaluate(self, test_images, test_labels):
-        x = np.expand_dims(test_images, axis=-1);
+        x = test_images
         y = utils.to_categorical(test_labels)
         return self.model.evaluate(x, y, verbose=0)
 
