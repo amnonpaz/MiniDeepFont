@@ -108,14 +108,19 @@ def load_database(filename: str):
 
 if __name__ == '__main__':
     input_filename = 'datasets/train/SynthText.h5'
-    font_images_filename = 'datasets/train/ExtractedFonts.h5'
+    validation_filename = 'datasets/validation/SynthTextValidation.h5'
+    font_train_db = 'datasets/train/ExtractedFonts.h5'
+    font_validation_db = 'datasets/validation/ExtractedFontsValidation.h5'
+
     shape = (28, 28)
-    prepare_database(input_filename, font_images_filename, shape, rewrite=False)
 
-    images, labels = load_database(font_images_filename, shape)
-    train_x, test_x, train_y, test_y = train_test_split(images, labels, test_size=0.20)
+    prepare_database(input_filename, font_train_db, shape, rewrite=True, augment=False)
+    prepare_database(validation_filename, font_validation_db, shape, rewrite=False)
 
-    model_filename = 'models/DeepFont.model'
+    train_x, train_y = load_database(font_train_db)
+    validate_x, validate_y = load_database(font_validation_db)
+
+    model_filename = 'models/MiniDeepFont.model'
     deep_font = DeepFont(shape + (3,), opt_name='sgd')
     if not path.exists(model_filename):
         evaluation = deep_font.train(train_x, train_y, 20, 32)
@@ -125,6 +130,6 @@ if __name__ == '__main__':
         deep_font.load(model_filename)
         print('Model loaded')
 
-    evaluation = deep_font.evaluate(test_x, test_y)
+    evaluation = deep_font.evaluate(validate_x, validate_y)
     print('Test Loss: {L} ; Accuracy: {A}'.format(L=evaluation[0], A=evaluation[1]))
  
