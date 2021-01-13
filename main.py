@@ -4,7 +4,7 @@ import cv2
 import numpy as np
 import Preprocess
 from os import path
-from DeepFont import DeepFont
+from MiniDeepFont import DeepFont
 from sklearn.model_selection import train_test_split
 
 fonts_attrs = {
@@ -144,7 +144,7 @@ def load_database(filename: str, shape: tuple):
 if __name__ == '__main__':
     input_filename = 'datasets/train/SynthText.h5'
     font_images_filename = 'datasets/train/ExtractedFonts.h5'
-    shape = (105, 105)
+    shape = (28, 28)
     prepare_database(input_filename, font_images_filename, shape, rewrite=False)
 
     images, labels = load_database(font_images_filename, shape)
@@ -153,7 +153,7 @@ if __name__ == '__main__':
     model_filename = 'models/DeepFont.model'
     deep_font = DeepFont(shape + (3,), opt_name='sgd')
     if not path.exists(model_filename):
-        evaluation = deep_font.train(train_x, train_y, 50, 128)
+        evaluation = deep_font.train(train_x, train_y, 20, 32)
         print('Model Loss: {L} ; Accuracy: {A}'.format(L=evaluation[0], A=evaluation[1]))
         deep_font.save(model_filename)
     else:
