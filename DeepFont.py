@@ -7,7 +7,7 @@ import numpy as np
 
 
 class DeepFont:
-    def __init__(self, input_shape):
+    def __init__(self, input_shape, opt_name='adam'):
         self.model = Sequential()
         self.model.add(Conv2D(64, kernel_size=(48, 48), activation='relu', input_shape=input_shape, name='conv_1'))
         self.model.add(BatchNormalization(name='norm_1'))
@@ -38,9 +38,13 @@ class DeepFont:
         self.model.add(Dense(2383, activation='relu', name='fc8'))
 
         self.model.add(Dense(3, activation='softmax', name='softmax_classifier'))
-
-        opt = optimizers.Adam(lr=0.01)
-        self.model.compile(loss='mean_squared_error', optimizer=opt, metrics=['accuracy'])
+        lr = 0.01
+        if opt_name == 'adam':
+            opt = optimizers.Adam(lr=lr)
+        elif opt_name == 'sgd':
+            opt = optimizers.SGD(lr=lr, decay=1e-6, momentum=0.9, nesterov=True)
+        #self.model.compile(loss='mean_squared_error', optimizer=opt, metrics=['accuracy'])
+        self.model.compile(loss='categorical_crossentropy', optimizer=opt, metrics=['accuracy'])
 
         self.model.summary()
 
