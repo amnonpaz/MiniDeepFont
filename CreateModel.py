@@ -88,7 +88,6 @@ def prepare_database(hdf5_input: str, hdf5_output: str, shape: tuple,
                     bb = bboxes[:, :, bb_idx]
                     character = Preprocess.crop_character(img, bb, shape, affine_crop)
                     label = encode_font_name(fonts[bb_idx].decode('utf-8'))
-                    #db_add_datadet(images_group, character, label, key, bb_idx, 'clean')
 
                     for func in augmentations[label]:
                         aug = func(character)
