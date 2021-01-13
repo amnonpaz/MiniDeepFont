@@ -71,9 +71,10 @@ def prepare_database(hdf5_input: str, hdf5_output: str, shape: tuple,
         with h5py.File(hdf5_output, 'w') as fonts_db:
             images_group = fonts_db.create_group('images')
 
+            print('Processing file {F}'.format(F=hdf5_input))
+
             keys = list(images_db['data'].keys())
             for key in keys:
-                print('Processing image {I}'.format(I=key))
                 img = images_db['data'][key][:]
                 if do_norm:
                     img = Preprocess.normalize_image(img)
