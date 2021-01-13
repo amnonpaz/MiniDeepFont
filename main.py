@@ -131,8 +131,12 @@ def prepare_database(hdf5_input: str, hdf5_output: str, shape: tuple,
 def load_database(filename: str, shape: tuple):
     with h5py.File(filename, 'r') as db:
         keys = list(db['images'].keys())
-        images = np.array([np.array(db['images'][k][:]).reshape(shape) for k in keys])
+        images = np.array([np.array(db['images'][k][:]) for k in keys])
         labels = np.array([db['images'][k].attrs['label'] for k in keys])
+
+        print('Total number of lables: {L}'.format(L=labels.shape[0]))
+        for l in range(labels.max() + 1):
+            print('Total number lables #{I}: {L}'.format(I=l, L=np.count_nonzero(labels == l)))
 
         return images, labels
 
