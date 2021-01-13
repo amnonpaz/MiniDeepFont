@@ -1,5 +1,7 @@
 import cv2
 import numpy as np
+from skimage import util, transform
+
 
 
 '''
@@ -43,3 +45,20 @@ def crop_character(image, bb, shape, affine=False):
         character = extract_font_crop_from_image_affine(image, points, shape)
 
     return character
+
+
+def unit(image):
+    return image
+
+
+def blur(image):
+    kernel_size = 3
+    return cv2.GaussianBlur(image ,(kernel_size, kernel_size), 0)
+
+
+def add_noise(image):
+    return util.random_noise(image, mode='gaussian', clip=True)
+
+
+def rotate(image):
+    return transform.rotate(image, 9)

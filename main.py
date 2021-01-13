@@ -77,8 +77,28 @@ def input_test(hdf5_filename, sample_index, affine_crop=False, do_norm=True, sho
         plt.show()
 
 
+def db_add_datadet(db_group, img, label,key: str, bb_idx: str, postfix=''):
+    dataset = db_group.create_dataset('{K}_{I}_{P}'.format(K=key, I=bb_idx, P=postfix),
+                                      shape=img.shape, data=img, dtype='f')
+    dataset.attrs['label'] = label
+
+
 def prepare_database(hdf5_input: str, hdf5_output: str, shape: tuple,
-                     affine_crop=False, do_norm=True, rewrite=False):
+                     affine_crop=False, do_norm=True, rewrite=False, augment=False):
+
+    if augment:
+        augmentations = {
+                0: [ Preprocess.unit, Preprocess.add_noise ],
+                1: [ Preprocess.unit ],
+                2: [ Preprocess.unit, Preprocess.add_noise, Preprocess.rotate]
+                }
+    else:
+        augmentations = {
+                0: [ Preprocess.unit ],
+                1: [ Preprocess.unit ],
+                2: [ Preprocess.unit ]
+                }
+
     with h5py.File(hdf5_input, 'r') as images_db:
         if not rewrite and path.exists(hdf5_output):
             return
@@ -98,9 +118,14 @@ def prepare_database(hdf5_input: str, hdf5_output: str, shape: tuple,
 
                 for bb_idx in range(bboxes.shape[-1]):
                     bb = bboxes[:, :, bb_idx]
-                    character = Preprocess.crop_character(img, bb, shape, affine_crop)[:, :, 0]
-                    dataset = images_group.create_dataset('{K}_{I}'.format(K=key, I=bb_idx), shape=character.shape, data=character, dtype='f')
-                    dataset.attrs['label'] = encode_font_name(fonts[bb_idx].decode('utf-8'))
+                    character = Preprocess.crop_character(img, bb, shape, affine_crop)
+                    label = encode_font_name(fonts[bb_idx].decode('utf-8'))
+                    #db_add_datadet(images_group, character, label, key, bb_idx, 'clean')
+
+                    for func in augmentations[label]:
+                        aug = func(character)
+                        db_add_datadet(images_group, aug, label, key, bb_idx, func.__name__)
+                        counts[label] += 1
 
 
 def load_database(filename: str, shape: tuple):
