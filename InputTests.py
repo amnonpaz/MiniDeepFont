@@ -2,6 +2,7 @@ import matplotlib.pyplot as plt
 import cv2
 import h5py
 import Preprocess
+from math import floor
 
 def input_test(hdf5_filename: str, sample_index: int, shape: tuple, affine_crop=False, do_norm=True, show_input=False):
 
@@ -34,11 +35,13 @@ def input_test(hdf5_filename: str, sample_index: int, shape: tuple, affine_crop=
 
         plt.figure('Fonts')
         plt.subplot()
-        for bb_idx in range(bboxes.shape[-1]):
+        fonts_rows = 3
+        fonts_to_display = min(bboxes.shape[-1], fonts_rows*3)
+        for bb_idx in range(fonts_to_display):
             bb = bboxes[:, :, bb_idx]
             character = Preprocess.crop_character(img, bb, shape, affine_crop)
 
-            plt.subplot(4, int(bboxes.shape[-1]/4 + 1), bb_idx + 1)
+            plt.subplot(fonts_rows, floor(fonts_to_display/fonts_rows), bb_idx + 1)
             plt.imshow(character if not do_norm else cv2.cvtColor(character, cv2.COLOR_YUV2RGB))
             plt.title(letters[bb_idx] + ': ' + fonts[bb_idx].decode("utf-8")), plt.xticks([]), plt.yticks([])
 
