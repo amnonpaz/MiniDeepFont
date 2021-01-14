@@ -31,6 +31,10 @@ def decode_font_name(font_code: int):
             return k
 
 
+def fonts_list():
+    return list(fonts_attrs.keys())
+
+
 def bb_color(font):
     tmp = font.decode('UTF-8')
     res = 'b'
