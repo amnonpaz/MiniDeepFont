@@ -135,7 +135,7 @@ if __name__ == '__main__':
 
     shape = (28, 28)
 
-    prepare_database(input_filename, font_train_db, shape, rewrite=True, augment=False)
+    prepare_database(input_filename, font_train_db, shape, rewrite=False)
     prepare_database(validation_filename, font_validation_db, shape, rewrite=False)
 
     train_x, train_y, _, _ = load_database(font_train_db)
