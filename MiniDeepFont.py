@@ -4,11 +4,12 @@ from tensorflow.keras.layers import Conv2D, MaxPooling2D, BatchNormalization, Co
 from tensorflow.keras import optimizers
 from tensorflow.keras import utils
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
+from CustomAugmentations import CustomAugmentations
 import numpy as np
 
 
 class DeepFont:
-    def __init__(self, input_shape, opt_name='adam'):
+    def __init__(self, input_shape, opt_name='adam', loss='mean_squared_error', use_augmentations=False):
         self.model = Sequential()
         self.model.add(Conv2D(32, kernel_size=(5, 5), activation='relu', input_shape=input_shape, name='conv_1'))
         self.model.add(BatchNormalization(name='norm_1'))
@@ -33,26 +34,37 @@ class DeepFont:
         self.model.add(Dense(512, activation='relu', name='fc_2'))
 
         self.model.add(Dense(3, activation='softmax', name='softmax_classifier'))
-    
+
         lr = 0.01
         if opt_name == 'adam':
-            opt = optimizers.Adam(lr=lr)
+            opt = optimizers.Adam(lr=lr, epsilon=1.0)
         elif opt_name == 'sgd':
             opt = optimizers.SGD(lr=lr, decay=1e-6, momentum=0.9, nesterov=True)
-        self.model.compile(loss='mean_squared_error', optimizer=opt, metrics=['accuracy'])
 
+        self.model.compile(loss=loss, optimizer=opt, metrics=['accuracy'])
+
+        self.datagen = CustomAugmentations() if use_augmentations else ImageDataGenerator()
+
+    def summarize(self):
         self.model.summary()
 
     def train(self, images, labels, epochs, batch_size):
         x = images
         y = utils.to_categorical(labels)
-        self.model.fit(x, y, shuffle=True, epochs=epochs, batch_size=batch_size)
-        return self.model.evaluate(x, y)
+        self.datagen.fit(x)
+        history = self.model.fit(self.datagen.flow(x, y, batch_size=batch_size),
+                                 steps_per_epoch=len(x) / batch_size,
+                                 epochs=epochs)
+        return { 'history': history.history,
+                 'evaluation': self.model.evaluate(x, y) }
 
     def evaluate(self, test_images, test_labels):
         x = test_images
         y = utils.to_categorical(test_labels)
         return self.model.evaluate(x, y, verbose=0)
+
+    def predict(self, x):
+        return self.model.predict(x)
 
     def save(self, filename):
         self.model.save(filename + '.h5')

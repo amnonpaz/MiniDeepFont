@@ -3,7 +3,7 @@ import numpy as np
 import Preprocess
 from os import path
 from MiniDeepFont import DeepFont
-from sklearn.model_selection import train_test_split
+import matplotlib.pyplot as plt
 
 fonts_attrs = {
     'Skylark': {
@@ -131,14 +131,23 @@ if __name__ == '__main__':
     validate_x, validate_y, validate_letters, validate_filenames = load_database(font_validation_db)
 
     model_filename = 'models/MiniDeepFont.model'
-    deep_font = DeepFont(shape + (3,), opt_name='sgd')
-    if not path.exists(model_filename):
-        evaluation = deep_font.train(train_x, train_y, 20, 32)
-        print('Model Loss: {L} ; Accuracy: {A}'.format(L=evaluation[0], A=evaluation[1]))
+    model_filename_full = model_filename + '.h5'
+
+    deep_font = DeepFont(shape + (3,), opt_name='sgd', use_augmentations=True)
+
+    if not path.exists(model_filename_full):
+        deep_font.summarize()
+        results = deep_font.train(train_x, train_y, 50, 32)
+        print('Model Loss: {L} ; Accuracy: {A}'.format(L=results['evaluation'][0], A=results['evaluation'][1]))
         deep_font.save(model_filename)
+        for x in results['history']:
+            plt.plot(results['history'][x], label=x)
+        plt.legend()
+        plt.show()
     else:
-        deep_font.load(model_filename)
+        deep_font.load(model_filename_full)
         print('Model loaded')
+        deep_font.summarize()
 
     evaluation = deep_font.evaluate(validate_x, validate_y)
     print('Test Loss: {L} ; Accuracy: {A}'.format(L=evaluation[0], A=evaluation[1]))

@@ -74,7 +74,7 @@ class DeepFont:
         return self.model.evaluate(x, y, verbose=0)
 
     def save(self, filename):
-        self.model.save(filename + '.h5')
+        self.model.save(filename + '.h5', verbose=0)
 
     def load(self, filename):
         self.model = load_model(filename)
