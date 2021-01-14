@@ -45,11 +45,11 @@ def bb_color(font):
     return res
 
 
-
-def db_add_datadet(db_group, img, label, letter, key: str, bb_idx: str, postfix=''):
-    dataset = db_group.create_dataset('{K}_{I}_{P}'.format(K=key, I=bb_idx, P=postfix),
+def db_add_datadet(db_group, img, label, letter, filename: str, bb_idx: str, postfix=''):
+    dataset = db_group.create_dataset('{F}_{I}_{P}'.format(F=filename, I=bb_idx, P=postfix),
                                       shape=img.shape, data=img, dtype='f')
     dataset.attrs['label'] = label
+    dataset.attrs['filename'] = filename
     dataset.attrs['letter'] = letter
 
 
@@ -103,12 +103,17 @@ def load_database(filename: str):
         keys = list(db['images'].keys())
         images = np.array([np.array(db['images'][k][:]) for k in keys])
         labels = np.array([db['images'][k].attrs['label'] for k in keys])
+        letters = np.array([db['images'][k].attrs['letter'] for k in keys])
+        filenames = np.array([db['images'][k].attrs['filename'] for k in keys])
 
         print('Total number of lables: {L}'.format(L=labels.shape[0]))
         for l in range(labels.max() + 1):
-            print('Total number lables #{I}: {L}'.format(I=l, L=np.count_nonzero(labels == l)))
+            print('Total number lables #{I} ({S}): {L}'
+                    .format(I=l, S=decode_font_name(l), L=np.count_nonzero(labels == l)))
 
-        return images, labels
+        return images, labels, letters, filenames
+
+
 
 
 if __name__ == '__main__':
@@ -122,8 +127,8 @@ if __name__ == '__main__':
     prepare_database(input_filename, font_train_db, shape, rewrite=True, augment=False)
     prepare_database(validation_filename, font_validation_db, shape, rewrite=False)
 
-    train_x, train_y = load_database(font_train_db)
-    validate_x, validate_y = load_database(font_validation_db)
+    train_x, train_y, _, _ = load_database(font_train_db)
+    validate_x, validate_y, validate_letters, validate_filenames = load_database(font_validation_db)
 
     model_filename = 'models/MiniDeepFont.model'
     deep_font = DeepFont(shape + (3,), opt_name='sgd')
