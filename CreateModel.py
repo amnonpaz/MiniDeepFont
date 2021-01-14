@@ -10,12 +10,12 @@ fonts_attrs = {
         'color': 'r',
         'code': 0
     },
-    'Ubuntu Mono': {
-        'color': 'g',
-        'code': 1
-    },
     'Sweet Puppy': {
         'color': 'b',
+        'code': 1
+    },
+    'Ubuntu Mono': {
+        'color': 'g',
         'code': 2
     }
 }
