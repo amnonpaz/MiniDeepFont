@@ -4,6 +4,7 @@ import Preprocess
 from os import path
 from MiniDeepFont import DeepFont
 import matplotlib.pyplot as plt
+import csv
 
 fonts_attrs = {
     'Skylark': {
@@ -114,6 +115,16 @@ def load_database(filename: str):
         return images, labels, letters, filenames
 
 
+def store_results(dest_filename, predictions, filenames, letters):
+    with open(dest_filename, 'w', newline='') as csvfile:
+        reswriter = csv.writer(csvfile, delimiter=',')
+        reswriter.writerow(['', 'image','char'] + fonts_list())
+        idx = 0
+        for v in np.argmax(predictions, axis=1):
+            res = np.zeros(len(fonts_attrs))
+            res[v] = 1.0
+            reswriter.writerow([idx] + [filenames[idx], letters[idx]] + res.tolist())
+            idx += 1
 
 
 if __name__ == '__main__':
@@ -151,4 +162,6 @@ if __name__ == '__main__':
 
     evaluation = deep_font.evaluate(validate_x, validate_y)
     print('Test Loss: {L} ; Accuracy: {A}'.format(L=evaluation[0], A=evaluation[1]))
- 
+
+    predictions = deep_font.predict(validate_x)
+    store_results('datasets/validation/results.csv', predictions, validate_filenames, validate_letters)
