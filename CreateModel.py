@@ -161,7 +161,7 @@ if __name__ == '__main__':
         deep_font.summarize()
 
     evaluation = deep_font.evaluate(validate_x, validate_y)
-    print('Test Loss: {L} ; Accuracy: {A}'.format(L=evaluation[0], A=evaluation[1]))
+    print('Validation Loss: {L} ; Accuracy: {A}'.format(L=evaluation[0], A=evaluation[1]))
 
     predictions = deep_font.predict(validate_x)
     store_results('datasets/validation/results.csv', predictions, validate_filenames, validate_letters)
