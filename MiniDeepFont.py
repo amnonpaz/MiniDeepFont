@@ -56,7 +56,7 @@ class DeepFont:
                                  steps_per_epoch=len(x) / batch_size,
                                  epochs=epochs)
         return { 'history': history.history,
-                 'evaluation': self.model.evaluate(x, y) }
+                 'evaluation': self.model.evaluate(x, y, verbose=0) }
 
     def evaluate(self, test_images, test_labels):
         x = test_images
