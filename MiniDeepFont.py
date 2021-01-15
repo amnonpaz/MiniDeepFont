@@ -5,6 +5,7 @@ from tensorflow.keras import optimizers
 from tensorflow.keras import utils
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
 from CustomAugmentations import CustomAugmentations
+from CustomTrainingCallbacks import EvaluteTrainSet
 import numpy as np
 
 
@@ -54,7 +55,8 @@ class DeepFont:
         self.datagen.fit(x)
         history = self.model.fit(self.datagen.flow(x, y, batch_size=batch_size),
                                  steps_per_epoch=len(x) / batch_size,
-                                 epochs=epochs)
+                                 epochs=epochs,
+                                 callbacks=[EvaluteTrainSet(x, y)])
         return { 'history': history.history,
                  'evaluation': self.model.evaluate(x, y, verbose=0) }
 
