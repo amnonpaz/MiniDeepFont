@@ -1,10 +1,48 @@
 import matplotlib.pyplot as plt
 import cv2
+import numpy as np
 import h5py
 import Preprocess
 from math import floor
 
-def input_test(hdf5_filename: str, sample_index: int, shape: tuple, affine_crop=False, do_norm=True, show_input=False):
+def plot_normalized(hdf5_filename: str, sample_indices):
+    colors = ['r', 'b', 'g']
+
+    with h5py.File(hdf5_filename, 'r') as images_db:
+        for sample_index in sample_indices:
+            imgs_keys = list(images_db['data'].keys())
+            key = imgs_keys[sample_index]
+            img = images_db['data'][key][:]
+
+            plt.figure('Image before/after normaization')
+            plt.subplot()
+
+            plt.subplot(2, 2, 1)
+            plt.imshow(cv2.cvtColor(img, cv2.COLOR_RGB2BGR)), plt.xticks([]), plt.yticks([])
+            plt.title('Original image')
+
+            plt.subplot(2, 2, 2)
+            for i in range(3):
+                histogram, bin_edges = np.histogram(img[:, :, i], bins=256, range=(0, 256))
+                plt.plot(bin_edges[0:-1], histogram, color=colors[i])
+                plt.title('Original image color histogram')
+
+            #img = cv2.cvtColor(Preprocess.normalize_image(img), cv2.COLOR_YUV2BGR)
+            img = Preprocess.normalize_image(img)
+            plt.subplot(2, 2, 3)
+            plt.imshow(img), plt.xticks([]), plt.yticks([])
+            plt.title('Normalized image')
+
+            plt.subplot(2, 2, 4)
+            for i in range(3):
+                histogram, bin_edges = np.histogram(img[:, :, i], bins=256, range=(0, 1))
+                plt.plot(bin_edges[0:-1], histogram, color=colors[i])
+                plt.title('Normalized image color histogram')
+
+            plt.show()
+
+
+def input_test(hdf5_filename: str, sample_index: int, shape: tuple, affine_crop=False, do_norm=True):
 
     with h5py.File(hdf5_filename, 'r') as images_db:
         imgs_keys = list(images_db['data'].keys())
@@ -23,15 +61,8 @@ def input_test(hdf5_filename: str, sample_index: int, shape: tuple, affine_crop=
 
         # If we normalize, we want to see the difference between
         # the original image and the normalized image
-        if show_input and do_norm:
-            plt.figure('Test image original')
-            plt.imshow(img)
-            plt.show(block=False), plt.xticks([]), plt.yticks([])
-
+        if do_norm:
             img = Preprocess.normalize_image(img)
-            plt.figure('Test image normalized')
-            plt.imshow(cv2.cvtColor(img, cv2.COLOR_YUV2RGB))
-            plt.show(block=False), plt.xticks([]), plt.yticks([])
 
         plt.figure('Fonts')
         plt.subplot()
@@ -55,4 +86,5 @@ if __name__ == '__main__':
     font_validation_db = 'datasets/validation/ExtractedFontsValidation.h5'
 
     shape = (28, 28)
-    input_test(input_filename , 450, shape)
+    #input_test(input_filename , 450, shape)
+    plot_normalized(input_filename , [450, 123, 45, 590])
