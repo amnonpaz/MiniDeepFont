@@ -6,7 +6,10 @@ import numpy as np
 Normalize the mean and std of each channel in an image
 '''
 def normalize_image(image):
-    return cv2.normalize(image, None, alpha=0, beta=1, norm_type=cv2.NORM_MINMAX, dtype=cv2.CV_32F)
+    image = cv2.normalize(image, None, alpha=0, beta=1, norm_type=cv2.NORM_MINMAX, dtype=cv2.CV_32F)
+    image -= image.mean()
+    image /= image.std()
+    return image
 
 
 '''
