@@ -3,6 +3,7 @@ from tensorflow.keras.models import load_model
 from tensorflow.keras.layers import Conv2D, MaxPooling2D, BatchNormalization, Conv2DTranspose, UpSampling2D, Flatten, Dense, Dropout
 from tensorflow.keras import optimizers
 from tensorflow.keras import utils
+from tensorflow.keras import metrics
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
 from CustomAugmentations import CustomAugmentations
 from CustomTrainingCallbacks import EvaluteTrainSet
@@ -42,7 +43,7 @@ class DeepFont:
         elif opt_name == 'sgd':
             opt = optimizers.SGD(lr=lr, decay=1e-6, momentum=0.9, nesterov=True)
 
-        self.model.compile(loss=loss, optimizer=opt, metrics=['accuracy'])
+        self.model.compile(loss=loss, optimizer=opt, metrics=['accuracy', metrics.AUC(curve="ROC")])
 
         self.datagen = CustomAugmentations() if use_augmentations else ImageDataGenerator()
 
