@@ -5,3 +5,5 @@
 *.pdf
 *.gz
 *.zip
+*.csv
+*.h5
