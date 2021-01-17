@@ -22,7 +22,7 @@ class DeepFont:
         self.model.add(MaxPooling2D(pool_size=(2, 2), name='pooling_2'))
 
         self.model.add(Conv2DTranspose(64, (3, 3), strides=(2, 2), activation='relu', padding='same',
-                                       kernel_initializer='uniform', name='convT_3'))
+                       kernel_initializer='uniform', name='convT_3'))
         self.model.add(UpSampling2D(size=(2, 2)))
 
         self.model.add(Conv2D(128, kernel_size=(3, 3), activation='relu', name='conv_4'))
