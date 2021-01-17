@@ -5,45 +5,8 @@ from os import path
 from MiniDeepFont import DeepFont
 import matplotlib.pyplot as plt
 import csv
+import Fonts
 
-fonts_attrs = {
-    'Skylark': {
-        'color': 'r',
-        'code': 0
-    },
-    'Sweet Puppy': {
-        'color': 'b',
-        'code': 1
-    },
-    'Ubuntu Mono': {
-        'color': 'g',
-        'code': 2
-    }
-}
-
-
-def encode_font_name(font_name: str):
-    return fonts_attrs[font_name]['code']
-
-
-def decode_font_name(font_code: int):
-    for k in fonts_attrs:
-        if fonts_attrs[k]['code'] == font_code:
-            return k
-
-
-def fonts_list():
-    return list(fonts_attrs.keys())
-
-
-def bb_color(font):
-    tmp = font.decode('UTF-8')
-    res = 'b'
-    for font_name, data in fonts_attrs.items():
-        if tmp == font_name:
-            res = data['color']
-            break
-    return res
 
 
 def db_add_datadet(db_group, img, letter, filename: str, idx: str, label = None):
@@ -80,7 +43,7 @@ def prepare_database(input_files: list, hdf5_output: str, shape: tuple,
                     for bb_idx in range(bboxes.shape[-1]):
                         bb = bboxes[:, :, bb_idx]
                         character = Preprocess.crop_character(img, bb, shape, affine_crop)
-                        label = encode_font_name(fonts[bb_idx].decode('utf-8')) if store_labels else None
+                        label = Fonts.encode_name(fonts[bb_idx].decode('utf-8')) if store_labels else None
 
                         db_add_datadet(images_group, character, letters[bb_idx], key, bb_idx, label)
 
@@ -97,7 +60,7 @@ def load_database(filename: str, load_labels = True):
         print('Total number of lables: {L}'.format(L=labels.shape[0]))
         for l in range(labels.max() + 1):
             print('Total number lables #{I} ({S}): {L}'
-                    .format(I=l, S=decode_font_name(l), L=np.count_nonzero(labels == l)))
+                    .format(I=l, S=Fonts.decode_name(l), L=np.count_nonzero(labels == l)))
 
         return images, labels, letters, filenames
 
@@ -105,10 +68,10 @@ def load_database(filename: str, load_labels = True):
 def store_results(dest_filename, predictions, filenames, letters):
     with open(dest_filename, 'w', newline='') as csvfile:
         reswriter = csv.writer(csvfile, delimiter=',')
-        reswriter.writerow(['', 'image','char'] + fonts_list())
+        reswriter.writerow(['', 'image','char'] + Fonts.get_list())
         idx = 0
         for v in np.argmax(predictions, axis=1):
-            res = np.zeros(len(fonts_attrs))
+            res = np.zeros(Fonts.get_number())
             res[v] = 1.0
             reswriter.writerow([idx] + [filenames[idx], letters[idx]] + res.tolist())
             idx += 1
