@@ -30,7 +30,7 @@ def prepare(input_files: list, hdf5_output: str, shape: tuple,
                     img = Preprocess.normalize_image(images_db['data'][key][:])
 
                     bboxes = images_db['data'][key].attrs['charBB']
-                    fonts = images_db['data'][key].attrs['font']
+                    fonts = images_db['data'][key].attrs['font'] if store_labels else None
                     letters = ''.join([word.decode('utf-8') for word in images_db['data'][key].attrs['txt']])
 
                     for bb_idx in range(bboxes.shape[-1]):
@@ -42,6 +42,8 @@ def prepare(input_files: list, hdf5_output: str, shape: tuple,
 
 
 def load(filename: str, load_labels = True):
+    labels = None
+
     with h5py.File(filename, 'r') as db:
         keys = db['images'].keys()
         images = np.array([np.array(db['images'][k][:]) for k in keys])
@@ -50,9 +52,10 @@ def load(filename: str, load_labels = True):
         if load_labels:
             labels = np.array([db['images'][k].attrs['label'] for k in keys])
 
-        print('Total number of lables: {L}'.format(L=labels.shape[0]))
-        for l in range(labels.max() + 1):
-            print('Total number lables #{I} ({S}): {L}'
-                    .format(I=l, S=Fonts.decode_name(l), L=np.count_nonzero(labels == l)))
+        if load_labels:
+            print('Total number of lables: {L}'.format(L=labels.shape[0]))
+            for l in range(labels.max() + 1):
+                print('Total number lables #{I} ({S}): {L}'
+                      .format(I=l, S=Fonts.decode_name(l), L=np.count_nonzero(labels == l)))
 
         return images, labels, letters, filenames
