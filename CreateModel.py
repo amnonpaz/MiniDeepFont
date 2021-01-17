@@ -46,29 +46,17 @@ def bb_color(font):
     return res
 
 
-def db_add_datadet(db_group, img, label, letter, filename: str, bb_idx: str, postfix=''):
-    dataset = db_group.create_dataset('{F}_{I}_{P}'.format(F=filename, I=bb_idx, P=postfix),
-                                      shape=img.shape, data=img, dtype='f')
+def db_add_datadet(db_group, img, letter, filename: str, idx: str, label = None):
+    dataset = db_group.create_dataset('{F}_{I:04d}'.format(F=filename, I=idx),
+                                      shape=img.shape, data=img, dtype='float32')
     dataset.attrs['label'] = label
     dataset.attrs['filename'] = filename
-    dataset.attrs['letter'] = letter
+    if letter is not None:
+        dataset.attrs['letter'] = letter
 
 
 def prepare_database(hdf5_input: str, hdf5_output: str, shape: tuple,
-                     affine_crop=False, do_norm=True, rewrite=False, augment=False):
-
-    if augment:
-        augmentations = {
-                0: [ Preprocess.unit, Preprocess.add_noise ],
-                1: [ Preprocess.unit ],
-                2: [ Preprocess.unit, Preprocess.add_noise, Preprocess.rotate]
-                }
-    else:
-        augmentations = {
-                0: [ Preprocess.unit ],
-                1: [ Preprocess.unit ],
-                2: [ Preprocess.unit ]
-                }
+                     affine_crop=False, do_norm=True, rewrite=False, store_labels=True):
 
     with h5py.File(hdf5_input, 'r') as images_db:
         if not rewrite and path.exists(hdf5_output):
@@ -79,8 +67,7 @@ def prepare_database(hdf5_input: str, hdf5_output: str, shape: tuple,
 
             print('Processing file {F}'.format(F=hdf5_input))
 
-            keys = list(images_db['data'].keys())
-            for key in keys:
+            for key in images_db['data'].keys():
                 img = images_db['data'][key][:]
                 if do_norm:
                     img = Preprocess.normalize_image(img)
@@ -92,20 +79,19 @@ def prepare_database(hdf5_input: str, hdf5_output: str, shape: tuple,
                 for bb_idx in range(bboxes.shape[-1]):
                     bb = bboxes[:, :, bb_idx]
                     character = Preprocess.crop_character(img, bb, shape, affine_crop)
-                    label = encode_font_name(fonts[bb_idx].decode('utf-8'))
+                    label = encode_font_name(fonts[bb_idx].decode('utf-8')) if store_labels else None
 
-                    for func in augmentations[label]:
-                        aug = func(character)
-                        db_add_datadet(images_group, aug, label, letters[bb_idx], key, bb_idx, func.__name__)
+                    db_add_datadet(images_group, character, letters[bb_idx], key, bb_idx, label)
 
 
-def load_database(filename: str):
+def load_database(filename: str, load_labels = True):
     with h5py.File(filename, 'r') as db:
-        keys = list(db['images'].keys())
+        keys = db['images'].keys()
         images = np.array([np.array(db['images'][k][:]) for k in keys])
-        labels = np.array([db['images'][k].attrs['label'] for k in keys])
         letters = np.array([db['images'][k].attrs['letter'] for k in keys])
         filenames = np.array([db['images'][k].attrs['filename'] for k in keys])
+        if load_labels:
+            labels = np.array([db['images'][k].attrs['label'] for k in keys])
 
         print('Total number of lables: {L}'.format(L=labels.shape[0]))
         for l in range(labels.max() + 1):
