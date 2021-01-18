@@ -75,3 +75,9 @@ class DeepFont:
     def load(self, filename):
         self.model = load_model(filename)
 
+    def save_plot(self, filename):
+        utils.plot_model(self.model,
+                         to_file=filename,
+                         show_shapes=True,
+                         show_layer_names=True,
+                         expand_nested=False)
