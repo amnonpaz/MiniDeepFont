@@ -25,7 +25,6 @@ def plot_normalized(hdf5_filename: str, sample_indices):
             for i in range(3):
                 histogram, bin_edges = np.histogram(img[:, :, i], bins=256, range=(0, 256))
                 plt.plot(bin_edges[0:-1], histogram, color=rgb_colors[i])
-                plt.title('Original image color histogram')
 
             img = Preprocess.normalize_image(img)
             plt.subplot(2, 2, 3)
@@ -34,9 +33,8 @@ def plot_normalized(hdf5_filename: str, sample_indices):
 
             plt.subplot(2, 2, 4)
             for i in range(3):
-                histogram, bin_edges = np.histogram(img[:, :, i], bins=256, range=(0, 1))
+                histogram, bin_edges = np.histogram(img[:, :, i], bins=512, range=(-5, 5))
                 plt.plot(bin_edges[0:-1], histogram, color=rgb_colors[i])
-                plt.title('Normalized image color histogram')
 
             plt.show()
 
@@ -85,5 +83,5 @@ if __name__ == '__main__':
     font_validation_db = 'datasets/validation/ExtractedFontsValidation.h5'
 
     shape = (28, 28)
-    #input_test(input_filename , 450, shape)
-    plot_normalized(input_filename , [450, 123, 45, 590])
+    input_test(input_filename , 450, shape, do_norm=True)
+    #plot_normalized(input_filename , [45])
