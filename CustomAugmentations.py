@@ -13,7 +13,6 @@ class CustomAugmentations(ImageDataGenerator):
         if (random.randint(0, 1) == 0):
             return image
 
-        #return self.add_shading(self.add_rotation(self.add_blur(self.add_noise(image))))
         return self.add_rotation(self.add_blur(self.add_noise(image)))
 
     def add_noise(self, image):
@@ -36,9 +35,3 @@ class CustomAugmentations(ImageDataGenerator):
 
         angle = random.uniform(-10, 10)
         return transform.rotate(image, angle)
-
-    def add_shading(self, image):
-        if (random.randint(0, 1) == 0):
-            return image
-
-        return image + cv2.Laplacian(image, cv2.CV_64F).astype('float32')
