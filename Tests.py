@@ -1,9 +1,14 @@
+from keras.preprocessing.image import load_img
+from keras.preprocessing.image import img_to_array
+from keras.preprocessing.image import ImageDataGenerator
 import matplotlib.pyplot as plt
 import cv2
 import numpy as np
 import h5py
 import Preprocess
 from math import floor
+from CustomAugmentations import CustomAugmentations
+import Database
 
 def plot_normalized(hdf5_filename: str, sample_indices):
     rgb_colors = ['r', 'b', 'g']
@@ -74,6 +79,19 @@ def input_test(hdf5_filename: str, sample_index: int, shape: tuple, affine_crop=
             plt.title(letters[bb_idx] + ': ' + fonts[bb_idx].decode("utf-8")), plt.xticks([]), plt.yticks([])
 
         plt.show()
+
+
+def plot_augmentations(filename:str, idx: int):
+    train_x, train_y, _, _ = Database.load(filename)
+    sample = np.expand_dims(train_x[idx], 0)
+    datagen = CustomAugmentations()
+    it = datagen.flow(sample, batch_size=1)
+    for i in range(9):
+        plt.subplot(330 + 1 + i)
+        batch = it.next()
+        image = batch[0]#.astype('uint8')
+        plt.imshow(image)
+    plt.show()
 
 
 if __name__ == '__main__':
