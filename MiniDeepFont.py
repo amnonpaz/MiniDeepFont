@@ -50,14 +50,28 @@ class DeepFont:
     def summarize(self):
         self.model.summary()
 
-    def train(self, images, labels, epochs, batch_size):
+    def train(self, images, labels, epochs, batch_size, validate_x = None, validate_y = None):
+
+        # Preparing training set
         x = images
         y = utils.to_categorical(labels)
         self.datagen.fit(x)
+
+        # Preparing validation set (if given)
+        validation_data = None
+        if validate_x is not None and validate_y is not None:
+            validation_data=(validate_x, utils.to_categorical(validate_y))
+
+        # Creating a callack which calculates the real training set
+        # metrics at the end of each epoch
+        train_set_evaluation_callback = EvaluteTrainSet(x, y)
+
+        # Training
         history = self.model.fit(self.datagen.flow(x, y, batch_size=batch_size),
                                  steps_per_epoch=len(x) / batch_size,
                                  epochs=epochs,
-                                 callbacks=[EvaluteTrainSet(x, y)])
+                                 callbacks=[train_set_evaluation_callback],
+                                 validation_data=validation_data)
         return { 'history': history.history,
                  'evaluation': self.model.evaluate(x, y, verbose=0) }
 
