@@ -72,7 +72,13 @@ class DeepFont:
                                  epochs=epochs,
                                  callbacks=[train_set_evaluation_callback],
                                  validation_data=validation_data)
-        return { 'history': history.history,
+
+        # Merging traing history with our custom evaluation callback's history
+        # (which is real training set accuracy & loss)
+        history = dict(list(history.history.items()) +
+                       list(train_set_evaluation_callback.get_history().items()))
+
+        return { 'history': history,
                  'evaluation': self.model.evaluate(x, y, verbose=0) }
 
     def evaluate(self, test_images, test_labels):
