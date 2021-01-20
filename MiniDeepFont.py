@@ -43,7 +43,7 @@ class DeepFont:
         elif opt_name == 'sgd':
             opt = optimizers.SGD(lr=lr, decay=1e-6, momentum=0.9, nesterov=True)
 
-        self.model.compile(loss=loss, optimizer=opt, metrics=['accuracy', metrics.AUC(curve="ROC")])
+        self.model.compile(loss=loss, optimizer=opt, metrics=['accuracy'])
 
         self.datagen = CustomAugmentations() if use_augmentations else ImageDataGenerator()
 
