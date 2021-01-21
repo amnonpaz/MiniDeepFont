@@ -1,6 +1,6 @@
 from os import path
+import sys
 from MiniDeepFont import DeepFont
-import matplotlib.pyplot as plt
 import Database
 import Results
 
@@ -13,7 +13,7 @@ shape = (28, 28)
 Files names for testing
 '''
 test_filenames = [ 'datasets/test/test.h5' ]
-font_test_db = 'datasets/test/test_fonts_db.h5'
+font_test_db = 'test_fonts_temp_db.h5'
 
 '''
 Model file name
@@ -25,6 +25,16 @@ Results filename
 '''
 test_results_file = 'test_results.csv'
 
+# python3 TestModel <model file name> <test set h5 file name> <csv result file name> <intermediate temp fil>
+print(sys.argv)
+if len(sys.argv) > 1:
+    model_filename_full = sys.argv[1]
+if len(sys.argv) > 2:
+    test_filenames = [ sys.argv[2] ]
+if len(sys.argv) > 3:
+    test_results_file = sys.argv[3]
+if len(sys.argv) > 4:
+    font_test_db = sys.argv[4]
 
 # Loading the model
 deep_font = DeepFont(shape + (3,))
