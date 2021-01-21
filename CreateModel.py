@@ -12,7 +12,7 @@ shape = (28, 28)
 '''
 Training parameters
 '''
-epochs = 20
+epochs = 10
 batch_size = 32
 
 '''
