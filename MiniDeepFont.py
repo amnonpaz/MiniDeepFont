@@ -5,6 +5,7 @@ from tensorflow.keras import optimizers
 from tensorflow.keras import utils
 from tensorflow.keras import metrics
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
+from tensorflow.keras.callbacks import ReduceLROnPlateau
 from CustomAugmentations import CustomAugmentations
 from CustomTrainingCallbacks import EvaluteTrainSet
 import numpy as np
@@ -66,11 +67,14 @@ class DeepFont:
         # metrics at the end of each epoch
         train_set_evaluation_callback = EvaluteTrainSet(x, y)
 
+        reduce_lr = ReduceLROnPlateau(monitor='val_loss', factor=0.25,
+                                      patience=1, min_lr=0.001, mode='min')
+
         # Training
         history = self.model.fit(self.datagen.flow(x, y, batch_size=batch_size),
                                  steps_per_epoch=len(x) / batch_size,
                                  epochs=epochs,
-                                 callbacks=[train_set_evaluation_callback],
+                                 callbacks=[train_set_evaluation_callback, reduce_lr],
                                  validation_data=validation_data)
 
         # Merging traing history with our custom evaluation callback's history
