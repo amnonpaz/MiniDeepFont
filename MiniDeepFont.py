@@ -37,11 +37,11 @@ class DeepFont:
 
         self.model.add(Dense(3, activation='softmax', name='softmax_classifier'))
 
-        lr = 0.01
+        lr = 0.04
         if opt_name == 'adam':
             opt = optimizers.Adam(lr=lr, epsilon=1.0)
         elif opt_name == 'sgd':
-            opt = optimizers.SGD(lr=lr, decay=1e-6, momentum=0.9, nesterov=True)
+            opt = optimizers.SGD(lr=lr, decay=1e-8, momentum=0.9, nesterov=True)
 
         self.model.compile(loss=loss, optimizer=opt, metrics=['accuracy'])
 
