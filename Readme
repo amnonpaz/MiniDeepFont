@@ -30,3 +30,5 @@ python3 TestModel.py <model file name> <test set h5 file name> <csv result file 
 - h5py
 - numpy
 - csv
+
+Link to the trained model: https://drive.google.com/file/d/1U4Pn1IsHkPM5Mo70q44G8XM-_Dc_TWiX/view?usp=sharing
