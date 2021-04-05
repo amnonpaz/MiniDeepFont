@@ -17,11 +17,12 @@ In CreateModel.py:
 - Line 25: Set the validation results filename
 - Line 32: Set the model file name (.h5 suffix will be added)
 
-Execution: python3 CreatModel.py
+_Execution_<br>
+`python3 CreatModel.py`
 
 ## Testing
-Execute: 
-python3 TestModel.py <model file name> <test set h5 file name> <csv result file name> <intermediate temp file>
+_Execution_<br>
+`python3 TestModel.py <model file name> <test set h5 file name> <csv result file name> <intermediate temp file>`
 
 - model file name: The model .h5 file
 - test set h5 file name: Test set database .h5 file
