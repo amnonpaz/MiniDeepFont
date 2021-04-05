@@ -1,9 +1,15 @@
-MiniDeepFont: Fonts classification CNN, based on DeepFont
+# MiniDeepFont: Fonts classification CNN
+
+Based on DeepFont [Paper](https://arxiv.org/pdf/1507.03196v1.pdf) by Adobe
+
+This is my final project in computer vision course #22982 of the Open University of Israel
+
+The input file was generated from [SynthText](https://github.com/ankush-me/SynthText). The objective is to detect one out of three possible fonts. The network I created is based on the one Adobe suggests in their paper, minus some layers and the unsupervised learning stage, and it achieved ~95% accuracy.
 
 When given .h5 file, the scripts create a cached fonts database, ready for training/predication.
 The names of these files should be set by the user.
 
-* Training:
+## Training:
 In CreateModel.py:
 - Line 22: Set the list of training datasets
 - Line 23: Set font cache database
@@ -13,7 +19,7 @@ In CreateModel.py:
 
 Execution: python3 CreatModel.py
 
-* Testing:
+## Testing:
 Execute: 
 python3 TestModel.py <model file name> <test set h5 file name> <csv result file name> <intermediate temp file>
 
@@ -22,13 +28,11 @@ python3 TestModel.py <model file name> <test set h5 file name> <csv result file 
 - csv result file name: Test results file
 - intermediate temp file: Fonts cache database
 
-* Required packages:
-- matplotlib
-- skimage 
-- tensorflow
-- keras
-- h5py
-- numpy
-- csv
-
-Link to the trained model: https://drive.google.com/file/d/1U4Pn1IsHkPM5Mo70q44G8XM-_Dc_TWiX/view?usp=sharing
+## Required packages:
+  * matplotlib
+  * skimage 
+  * tensorflow
+  * keras
+  * h5py
+  * numpy
+  * csv
