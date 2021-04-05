@@ -9,7 +9,7 @@ The input file was generated from [SynthText](https://github.com/ankush-me/Synth
 When given .h5 file, the scripts create a cached fonts database, ready for training/predication.
 The names of these files should be set by the user.
 
-## Training:
+## Training
 In CreateModel.py:
 - Line 22: Set the list of training datasets
 - Line 23: Set font cache database
@@ -19,7 +19,7 @@ In CreateModel.py:
 
 Execution: python3 CreatModel.py
 
-## Testing:
+## Testing
 Execute: 
 python3 TestModel.py <model file name> <test set h5 file name> <csv result file name> <intermediate temp file>
 
@@ -28,7 +28,7 @@ python3 TestModel.py <model file name> <test set h5 file name> <csv result file 
 - csv result file name: Test results file
 - intermediate temp file: Fonts cache database
 
-## Required packages:
+## Required packages
   * matplotlib
   * skimage 
   * tensorflow
